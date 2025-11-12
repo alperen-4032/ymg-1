@@ -1,0 +1,128 @@
+openapi: 3.0.3
+info:
+  title: Akıllı Gardırop API
+  description: >-
+    Kameradan alınan görüntüye göre kullanıcının ruh halini analiz eden
+    ve buna uygun kıyafet kombinleri öneren akıllı gardırop sistemi için
+    REST servisi.
+  version: 1.0.0
+servers:
+  - url: http://127.0.0.1:5000
+    description: Yerel Geliştirme Sunucusu
+
+# 1. API Yolları (Endpoints)
+paths:
+
+  # Ana Akış: Kombin Önerisini Başlatma
+  /api/start_recommendation:
+    post:
+      summary: Kombin öneri akışını başlatır.
+      description: >-
+        Kullanıcı gardırop önüne geldiğinde (veya ekrana dokunduğunda) tetiklenir. 
+        Sunucu tarafında kamera görüntüsünü (simüle edilmiş) alır, 
+        duygu analizi yapar ve bir kombin önerisi döndürür.
+      tags:
+        - Öneri Akışı
+      responses:
+        # Başarılı (200) Yanıt
+        '200':
+          description: Ruh hali ve kombin önerileri başarıyla alındı.
+          content:
+            application/json:
+              schema:
+                # Dönecek JSON objesinin yapısı
+                $ref: '#/components/schemas/RecommendationResponse'
+        # Hata (500) Yanıtı
+        '500':
+          description: Sunucu tarafında beklenmedik bir hata oluştu.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # Yardımcı: Kategorileri Getirme
+  /api/categories:
+    get:
+      summary: Tüm kıyafet kategorilerini listeler.
+      description: >-
+        Ekranda manuel seçim için (sol tarafta) gösterilecek 
+        kategorilerin listesini döndürür.
+      tags:
+        - Kategoriler
+      responses:
+        # Başarılı (200) Yanıt
+        '200':
+          description: Kategori listesi başarıyla alındı.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  # Dönecek JSON dizisinin içindeki objelerin yapısı
+                  $ref: '#/components/schemas/Category'
+
+# 2. Tekrar Kullanılabilir Bileşenler (Schemas)
+components:
+  schemas:
+    
+    # Bir kıyafet parçası
+    OutfitItem:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Kıyafetin benzersiz ID'si
+          example: "k001"
+        ad:
+          type: string
+          description: Kıyafetin adı
+          example: "Canlı Sarı Tişört"
+        tip:
+          type: string
+          description: Kıyafetin türü (üst, alt, ayakkabı vb.)
+          example: "ust"
+    
+    # Bir kategori
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Kategorinin benzersiz ID'si
+          example: "cat_01"
+        ad:
+          type: string
+          description: Kategorinin adı
+          example: "Üst Giyim"
+    
+    # /api/start_recommendation için başarılı yanıt modeli
+    RecommendationResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        avatar_url:
+          type: string
+          description: "Ekranda gösterilecek temsili avatarın URL'i."
+          example: "/static/avatars/generic_user_avatar.png"
+        detected_mood:
+          type: string
+          description: "Yapay zeka tarafından tespit edilen ruh hali."
+          example: "Neşeli"
+        recommendations:
+          type: array
+          description: "Ruh haline uygun önerilen kombin (kıyafet listesi)."
+          items:
+            $ref: '#/components/schemas/OutfitItem'
+            
+    # Genel hata yanıt modeli
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "error"
+        message:
+          type: string
+          example: "Bir hata oluştu."
