@@ -1,0 +1,150 @@
+import time
+from flask import Flask, jsonify, request
+import random
+
+# --- Flask Uygulamasını Başlatma ---
+app = Flask(__name__)
+
+# --- 1. Simüle Edilmiş Bileşenler (Mocking) ---
+# Bu fonksiyonlar, henüz sahip olmadığınız fiziksel donanımları (Kamera)
+# ve karmaşık AI servislerini (DuyguAnaliz, KombinMotoru) taklit eder.
+
+def mock_kamera_goruntu_al():
+    """
+    (Sequence 1)
+    Kameradan görüntü almayı simüle eder.
+    Gerçekte burada OpenCV veya benzeri bir kütüphane ile donanımdan görüntü alınırdı.
+    """
+    print("Simülasyon: Kamera'dan görüntü verisi alınıyor...")
+    # Görüntü verisi yerine bir metin temsili dönüyoruz
+    return "mock_goruntu_verisi_bytes_12345"
+
+def mock_duygu_analiz_servisi(goruntu_verisi):
+    """
+    (Sequence 3)
+    Yapay zeka duygu analiz servisini simüle eder.
+    Gerçekte burada bir TensorFlow, PyTorch veya bulut AI (Örn: Azure/Google Vision)
+    modeline istek atılırdı.
+    """
+    print(f"Simülasyon: '{goruntu_verisi}' verisi ile duygu analizi yapılıyor...")
+    time.sleep(1) # AI modelinin düşünme süresini taklit et
+    
+    olasi_ruh_halleri = ["Neşeli", "Üzgün", "Sakin", "Enerjik"]
+    secilen_ruh_hali = random.choice(olasi_ruh_halleri)
+    print(f"Simülasyon: Tespit edilen ruh hali: {secilen_ruh_hali}")
+    return secilen_ruh_hali
+
+def mock_kombin_motoru(ruh_hali):
+    """
+    (Sequence 4)
+    Ruh haline göre kombin öneren motoru simüle eder.
+    Gerçekte burası, gardıroptaki mevcut kıyafetlerin veritabanına
+    ve bir kural motoruna (veya AI'a) bağlı olurdu.
+    """
+    print(f"Simülasyon: '{ruh_hali}' ruh hali için kombin aranıyor...")
+    
+    # Basit bir kural motoru simülasyonu
+    kombin_veritabani = {
+        "Neşeli": [
+            {"id": "k001", "ad": "Canlı Sarı Tişört", "tip": "ust"},
+            {"id": "k002", "ad": "Mavi Kot Pantolon", "tip": "alt"},
+            {"id": "k003", "ad": "Beyaz Sneaker", "tip": "ayakkabi"}
+        ],
+        "Üzgün": [
+            {"id": "k010", "ad": "Koyu Gri Kapüşonlu", "tip": "ust"},
+            {"id": "k011", "ad": "Siyah Eşofman Altı", "tip": "alt"},
+            {"id": "k012", "ad": "Rahat Terlik", "tip": "ayakkabi"}
+        ],
+        "Sakin": [
+            {"id": "k020", "ad": "Bej Keten Gömlek", "tip": "ust"},
+            {"id": "k021", "ad": "Kahverengi Kumaş Pantolon", "tip": "alt"},
+            {"id": "k022", "ad": "Deri Loafer", "tip": "ayakkabi"}
+        ],
+        "Enerjik": [
+            {"id": "k030", "ad": "Sporcu Atleti", "tip": "ust"},
+            {"id": "k031", "ad": "Koşu Şortu", "tip": "alt"},
+            {"id": "k032", "ad": "Spor Ayakkabısı", "tip": "ayakkabi"}
+        ]
+    }
+    
+    # Ruh haline uygun kombini bul, bulamazsan varsayılan bir kombin ver
+    return kombin_veritabani.get(ruh_hali, [{"id": "k999", "ad": "Varsayılan Kombin", "tip": "set"}])
+
+def mock_temsili_goruntu_getir(goruntu_verisi):
+    """
+    (Sequence 2)
+    Kişinin kaba taslak figürünü (hologram/avatar) oluşturacak
+    veriyi simüle eder. Gerçekte bu, bir 3D modelleme veya 
+    ismini soyutlama (anonymization) işlemi sonucu dönen bir URL olabilirdi.
+    """
+    print(f"Simülasyon: '{goruntu_verisi}' için temsili avatar URL'i oluşturuluyor...")
+    # Ekranın (frontend) göstereceği sabit bir avatar URL'i
+    return "/static/avatars/generic_user_avatar.png"
+
+
+# --- 2. REST API Uç Noktaları (Endpoints) ---
+
+@app.route('/api/start_recommendation', methods=['POST'])
+def start_recommendation_flow():
+    """
+    BU ANA ENDPOINT, SEQUENCE DIAGRAM'INIZI BAŞLATIR.
+    Kamera (veya bir sensör) 'KullanıcıAlgılandı()' sinyalini verdiğinde
+    dokunmatik ekran (frontend) bu API'yi çağırır.
+    """
+    print("\n--- Yeni Kombin Öneri Akışı Başladı ---")
+    
+    # --- Sequence 1: Görüntü Alma ---
+    # Gerçek uygulamada, bu POST isteğinin gövdesinde (body)
+    # kameradan alınan fotoğraf (örn: base64 string) gelirdi.
+    # Biz şimdilik 'request.data' geldiğini varsayıp, mock fonksiyonu çağırıyoruz.
+    # image_data_from_request = request.data
+    
+    # Adım 1: Kameradan görüntüyü al
+    captured_image_data = mock_kamera_goruntu_al()
+    
+    # --- Sequence 2: Hologram Gösterme ---
+    # Ekrana gösterilecek avatarın bilgisini al
+    avatar_url = mock_temsili_goruntu_getir(captured_image_data)
+    
+    # --- Sequence 3: Ruh Hali Analizi ---
+    # Görüntüyü AI servisine gönder ve ruh halini öğren
+    detected_mood = mock_duygu_analiz_servisi(captured_image_data)
+    
+    # --- Sequence 4: Kombin Önerme ---
+    # Ruh haline göre kombin motorundan önerileri al
+    recommended_outfits = mock_kombin_motoru(detected_mood)
+    
+    # --- Sequence 5: Sonucu Ekrana Yansıtma ---
+    # Toplanan tüm bilgileri JSON formatında Ekran'a (Frontend'e) geri döndürür.
+    # Ekran (React, Vue, vb. çalışan arayüz) bu JSON'ı alıp
+    # sağda avatarı, solda kategorileri/kombinleri gösterir.
+    
+    print("--- Akış Tamamlandı. Sonuçlar Ekrana (API İstemcisi) Gönderiliyor ---")
+    
+    return jsonify({
+        "status": "success",
+        "avatar_url": avatar_url, # Ekranın sağda göstereceği figür
+        "detected_mood": detected_mood,
+        "recommendations": recommended_outfits # Ekranda gösterilecek kombinler
+    })
+
+@app.route('/api/categories', methods=['GET'])
+def get_categories():
+    """
+    Ekranın sol tarafında gösterilecek kategorileri sağlayan
+    yardımcı bir endpoint.
+    """
+    categories_db = [
+        {"id": "cat_01", "ad": "Üst Giyim"},
+        {"id": "cat_02", "ad": "Alt Giyim"},
+        {"id": "cat_03", "ad": "Dış Giyim"},
+        {"id": "cat_04", "ad": "Ayakkabılar"},
+        {"id": "cat_05", "ad": "Aksesuarlar"}
+    ]
+    return jsonify(categories_db)
+
+# --- Uygulamayı Çalıştırma ---
+if __name__ == '__main__':
+    # 'host="0.0.0.0"' parametresi, servisin ağdaki diğer cihazlar
+    # (örn: gardıroptaki dokunmatik ekran) tarafından erişilebilir olmasını sağlar.
+    app.run(debug=True, host='0.0.0.0', port=5000)
